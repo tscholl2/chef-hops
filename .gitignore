@@ -1,3 +1,4 @@
 webpack.config.js
 lib/
 node_modules/
+www/
