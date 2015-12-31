@@ -111,9 +111,7 @@ module.exports = class Bunny
     (callback) => @WiggleNose callback
     (callback) => @TwitchEars callback
     (callback) => @TwitchEars callback
-    (callback) =>
-      @WalkTo MousePosition().x,MousePosition().y,null,callback
-      console.log "walking to (#{MousePosition().x},#{MousePosition().y})"
+    (callback) => @WalkTo MousePosition().x,MousePosition().y,null,callback
   ]
 
   ActNatural: (forever) ->
