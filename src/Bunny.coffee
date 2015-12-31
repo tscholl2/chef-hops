@@ -85,7 +85,7 @@ module.exports = class Bunny
     @gp.scale @scale
     .style "display: block"
 
-  Click: (callback) ->
+  onClick: (callback) ->
     @gp.click callback
 
   regularActions: -> [
@@ -124,13 +124,20 @@ module.exports = class Bunny
     if @keep_moving
       setTimeout (=> @ActNatural()), Math.random() * 1000 + 750
 
+  InMotion: -> @in_motion
+
   Stop: ->
     @keep_moving = false
 
-  Say: (msg, cb) ->
+  Say: (msg, callback, audioFile) ->
     @speechText.text msg
     @speech.show()
-    setTimeout (=> @speech.hide()), 5000
+    if audioFile?
+      a = new Audio audioFile
+      a.Play()
+      a.onended = => @speech.hide() and callback?()
+    else
+      setTimeout (=> @speech.hide() and callback?()), 5000
 
   Blink: (callback) ->
     @right_eye_closed.show()
