@@ -1,8 +1,6 @@
 SVG = require 'svg.js'
 
-window.SV = SVG
-
-class Bunny
+module.exports Bunny
   constructor: (@dom_svg_element) ->
     # scaled size
     @scale = 0.5
@@ -231,5 +229,3 @@ class Bunny
     .during (v,m) => @back_right_leg.transform {rotation: -20+20*v, relative: false}
     .after =>
       @_run1 i-1,leg_speed, callback
-
-module.exports = Bunny

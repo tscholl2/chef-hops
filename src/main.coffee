@@ -1,4 +1,3 @@
-
 svg = document.createElement "svg"
 svg.style.left = "0px"
 svg.style.top = "0px"
@@ -10,6 +9,8 @@ svg.style.zIndex = "9999999"
 svg.style.pointerEvents = "none"
 document.body.appendChild svg
 
-B = require './Bunny'
-window.b = new B svg
-window.b.ActNatural()
+Bunny = require './Bunny'
+b = new Bunny svg
+b.ActNatural()
+
+window.b = b
