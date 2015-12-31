@@ -1,6 +1,8 @@
 SVG = require 'svg.js'
 
-module.exports Bunny
+MousePosition = require './mouse'
+
+module.exports = class Bunny
   constructor: (@dom_svg_element) ->
     # scaled size
     @scale = 0.5
@@ -86,28 +88,43 @@ module.exports Bunny
   Click: (callback) ->
     @gp.click callback
 
+  regularActions: -> [
+    (callback) => @Blink callback
+    (callback) => @Blink callback
+    (callback) => @Blink callback
+    (callback) => @TwitchTail callback
+    (callback) => @TwitchTail callback
+    (callback) => @WiggleNose callback
+    (callback) => @WiggleNose callback
+    (callback) => @TwitchEars callback
+    (callback) => @TwitchEars callback
+    (callback) => @Walk callback
+  ]
+
+  followMouseActions: -> [
+    (callback) => @Blink callback
+    (callback) => @Blink callback
+    (callback) => @Blink callback
+    (callback) => @TwitchTail callback
+    (callback) => @TwitchTail callback
+    (callback) => @WiggleNose callback
+    (callback) => @WiggleNose callback
+    (callback) => @TwitchEars callback
+    (callback) => @TwitchEars callback
+    (callback) =>
+      @WalkTo MousePosition().x,MousePosition().y,null,callback
+      console.log "walking to (#{MousePosition().x},#{MousePosition().y})"
+  ]
+
   ActNatural: (forever) ->
     @in_motion = true
-    actions = [
-      (callback) => @Blink callback
-      (callback) => @Blink callback
-      (callback) => @Blink callback
-      (callback) => @TwitchTail callback
-      (callback) => @TwitchTail callback
-      (callback) => @WiggleNose callback
-      (callback) => @WiggleNose callback
-      (callback) => @TwitchEars callback
-      (callback) => @TwitchEars callback
-      (callback) => @Walk callback
-    ]
     if forever? and forever == true
       @keep_moving = true
+    actions = @followMouseActions()
     actions[Math.floor (Math.random() * actions.length)] =>
       @in_motion = false
     if @keep_moving
-      _f = =>
-        @ActNatural()
-      setTimeout _f, Math.random() * 1000 + 750
+      setTimeout (=> @ActNatural()), Math.random() * 1000 + 750
 
   Stop: ->
     @keep_moving = false

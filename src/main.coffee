@@ -14,3 +14,5 @@ b = new Bunny svg
 b.ActNatural()
 
 window.b = b
+
+window.m = require './mouse'
