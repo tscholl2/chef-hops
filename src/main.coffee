@@ -12,4 +12,4 @@ document.body.appendChild svg
 
 B = require './Bunny'
 window.b = new B svg
-#window.b.ActNatural()
+window.b.ActNatural()
