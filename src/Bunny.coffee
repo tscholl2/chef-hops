@@ -134,7 +134,7 @@ module.exports = class Bunny
     @speech.show()
     if audioFile?
       a = new Audio audioFile
-      a.Play()
+      a.play()
       a.onended = => @speech.hide() and callback?()
     else
       setTimeout (=> @speech.hide() and callback?()), 5000
