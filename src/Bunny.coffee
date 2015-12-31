@@ -65,7 +65,6 @@ class Bunny
     .style "pointer-events: visiblefill;"
     @nose = SVG.get 'nose'
     @left_mouth = SVG.get 'left-mouth'
-    .style "stroke-width:1;fill:#000;"
     @right_mouth = SVG.get 'right-mouth'
     @left_tooth = SVG.get 'left-tooth'
     @right_tooth = SVG.get 'right-tooth'
