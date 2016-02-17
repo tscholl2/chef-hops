@@ -3,25 +3,21 @@ RAW_SVG = require 'raw!../resources/bunny.svg'
 MousePosition = require './mouse'
 
 module.exports = class Bunny
-  constructor: (@dom_svg_element) ->
+  constructor: (@el) ->
     # scaled size
-    @scale = 0.5
+    @scale = 0.5 # use .Scale() method to change
     #variable for speed, about ~ number of leg movements/second
     @leg_actions_per_second = 1.08
     #movment, about ~ 1px / second
     @pixels_per_second = 30.14
-    #time for blink in ms
+    #timing in ms
     @blink_speed = 200
-    #also ms
     @ear_twitch_speed = 200
-    #also ms
     @tail_twitch_speed = 200
-    #animating monitor
-    @in_motion = false
-    @keep_moving = true
-    @walking = false
+    #animating monitoring
+    @action_timer = null
     #svg element functions
-    @draw = SVG @dom_svg_element
+    @draw = SVG @el
     @gp = @draw.group()
     # load svg
     @draw.svg RAW_SVG
@@ -60,6 +56,11 @@ module.exports = class Bunny
   onClick: (callback) ->
     @gp.click callback
 
+   Scale: (s) ->
+      if not s? then return @scale
+      @scale = s
+      @gp.scale s
+
   regularActions: -> [
     (callback) => @Blink callback
     (callback) => @Blink callback
@@ -73,33 +74,12 @@ module.exports = class Bunny
     (callback) => @Walk callback
   ]
 
-  followMouseActions: -> [
-    (callback) => @Blink callback
-    (callback) => @Blink callback
-    (callback) => @Blink callback
-    (callback) => @TwitchTail callback
-    (callback) => @TwitchTail callback
-    (callback) => @WiggleNose callback
-    (callback) => @WiggleNose callback
-    (callback) => @TwitchEars callback
-    (callback) => @TwitchEars callback
-    (callback) => @WalkTo MousePosition().x,MousePosition().y,null,callback
-  ]
-
-  ActNatural: (forever) ->
-    @in_motion = true
-    if forever? and forever == true
-      @keep_moving = true
-    actions = @followMouseActions()
-    actions[Math.floor (Math.random() * actions.length)] =>
-      @in_motion = false
-    if @keep_moving
-      setTimeout (=> @ActNatural()), Math.random() * 1000 + 750
-
-  InMotion: -> @in_motion
+  ActNatural: () ->
+    @regularActions()[Math.floor (Math.random() * @regularActions().length)]()
+    @action_timer = setTimeout (=> @ActNatural()), Math.random() * 1000 + 750
 
   Stop: ->
-    @keep_moving = false
+    clearTimeout @action_timer
 
   Say: (msg, callback, audioFile) ->
     @speechText.text msg
@@ -163,11 +143,21 @@ module.exports = class Bunny
       .after ->
         return callback?()
 
-  Walk: (callback) ->
-    if @walking
-      return callback?()
-    x = Math.random() * window.innerWidth #document.getElementById("main-screen").scrollHeight
-    y = Math.random() * window.innerHeight #document.getElementById("main-screen").scrollWidth
+   randomPosition: ->
+      rect = @el.getBoundingClientRect()
+      console.log rect
+      x = Math.random() * (rect.width - 40*@Scale()) + rect.left
+      y = Math.random() * (rect.height - 125*@Scale()) + rect.top
+      return [x,y]
+
+  Walk: (callback, towardsMouse) ->
+   if towardsMouse
+       x = MousePosition().x
+       y = MousePosition().y
+   else
+       #x = Math.random() * window.innerWidth
+       #y = Math.random() * window.innerHeight
+       [x,y] = @randomPosition()
     d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
     duration = 1000 * d * 1.0 / @pixels_per_second
     return @WalkTo x, y, duration, callback
@@ -176,8 +166,10 @@ module.exports = class Bunny
   #treat like center = (x,y)
   WalkTo: (x,y,duration,callback) ->
     if not x? or not y?
-      x = Math.random() * window.innerWidth
-      y = Math.random() * window.innerHeight
+      #x = Math.random() * (@el.clientWidth - 40) + @el.clientLeft
+      #y = Math.random() * (@el.clientHeight + 105) + @el.clientTop
+      [x,y] = @randomPosition()
+    console.log "going to #{x},#{y}"
     if not duration?
       d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
       duration = 1000 * d * 1.0 / @pixels_per_second
