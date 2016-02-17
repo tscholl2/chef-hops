@@ -9,6 +9,7 @@
     "coffee-script": "^1.10.0",
     "webpack": "^1.12.2",
     "coffee-loader": "^0.7.2",
+    "raw-loader": "^0.5.1",
     "webpack-dev-server": "^1.12.1"
   }
 }
