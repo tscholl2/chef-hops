@@ -157,7 +157,7 @@ module.exports = class Bunny
       #x = Math.random() * window.innerWidth
       #y = Math.random() * window.innerHeight
       [x,y] = @randomPosition()
-    return @WalkTo x, y, 100, callback
+    return @WalkTo x, y, null, callback
 
   #walks to the given position
   #treat like center = (x,y)
