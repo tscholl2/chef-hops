@@ -56,10 +56,10 @@ module.exports = class Bunny
   onClick: (callback) ->
     @gp.click callback
 
-   Scale: (s) ->
-      if not s? then return @scale
-      @scale = s
-      @gp.scale s
+  Scale: (s) ->
+    if not s? then return @scale
+    @scale = s
+    @gp.scale s
 
   regularActions: -> [
     (callback) => @Blink callback
@@ -145,31 +145,23 @@ module.exports = class Bunny
 
    randomPosition: ->
       rect = @el.getBoundingClientRect()
-      console.log rect
-      x = Math.random() * (rect.width - 40*@Scale()) + rect.left
-      y = Math.random() * (rect.height - 125*@Scale()) + rect.top
+      x = Math.random() * (rect.width - 40*@Scale()) + 30*@Scale()
+      y = Math.random() * (rect.height - 115*@Scale()) + 40*@Scale()
       return [x,y]
 
   Walk: (callback, towardsMouse) ->
-   if towardsMouse
-       x = MousePosition().x
-       y = MousePosition().y
-   else
-       #x = Math.random() * window.innerWidth
-       #y = Math.random() * window.innerHeight
-       [x,y] = @randomPosition()
-    d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
-    duration = 1000 * d * 1.0 / @pixels_per_second
-    return @WalkTo x, y, duration, callback
+    if towardsMouse
+      x = MousePosition().x
+      y = MousePosition().y
+    else
+      #x = Math.random() * window.innerWidth
+      #y = Math.random() * window.innerHeight
+      [x,y] = @randomPosition()
+    return @WalkTo x, y, 100, callback
 
   #walks to the given position
   #treat like center = (x,y)
   WalkTo: (x,y,duration,callback) ->
-    if not x? or not y?
-      #x = Math.random() * (@el.clientWidth - 40) + @el.clientLeft
-      #y = Math.random() * (@el.clientHeight + 105) + @el.clientTop
-      [x,y] = @randomPosition()
-    console.log "going to #{x},#{y}"
     if not duration?
       d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
       duration = 1000 * d * 1.0 / @pixels_per_second
