@@ -21,8 +21,9 @@ module.exports = class Bunny
     @gp = @draw.group()
     # load svg
     @draw.svg RAW_SVG
-    @gp = SVG.get "bunny"
+    @gp = SVG.get "group"
     # body parts
+    @bunny = SVG.get "bunny"
     @left_ear = SVG.get 'left-ear'
     .style "pointer-events: visiblefill;"
     @right_ear = SVG.get 'right-ear'
@@ -149,13 +150,15 @@ module.exports = class Bunny
       y = Math.random() * (rect.height - 115*@Scale()) + 40*@Scale()
       return [x,y]
 
+  setHeading: (x,y) ->
+    if (@gp.cx() > x and @bunny.transform().skewY isnt 0) or (@gp.cx() < x and @bunny.transform().skewY == 0)
+      @bunny.flip("x")
+
   Walk: (callback, towardsMouse) ->
     if towardsMouse
       x = MousePosition().x
       y = MousePosition().y
     else
-      #x = Math.random() * window.innerWidth
-      #y = Math.random() * window.innerHeight
       [x,y] = @randomPosition()
     return @WalkTo x, y, null, callback
 
@@ -165,7 +168,7 @@ module.exports = class Bunny
     if not duration?
       d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
       duration = 1000 * d * 1.0 / @pixels_per_second
-    #console.log "moving to #{x}, #{y} time taken: #{d}"
+    @setHeading x, y
     @gp.animate duration
     .dmove x - @gp.cx(), y - @gp.cy()
     .after ->

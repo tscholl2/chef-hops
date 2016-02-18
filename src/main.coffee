@@ -13,7 +13,7 @@ document.body.appendChild svg
 Bunny = require './Bunny'
 b = new Bunny svg
 b.Scale(0.33)
-b.ActNatural()
+#b.ActNatural()
 
 window.b = b
 
