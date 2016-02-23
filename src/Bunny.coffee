@@ -22,17 +22,25 @@ module.exports = class Bunny
     # load svg
     @draw.svg RAW_SVG
     @gp = SVG.get "group"
+    @inner_gp = SVG.get "inner-group"
     # body parts
-    @bunny = SVG.get "bunny"
     @left_ear = SVG.get 'left-ear'
     .style "pointer-events: visiblefill;"
     @right_ear = SVG.get 'right-ear'
     .style "pointer-events: visiblefill;"
+    @ear_anchor = [
+      SVG.get('ear-group').bbox().cx,
+      SVG.get('ear-group').bbox().height + SVG.get('ear-group').bbox().y,
+    ]
     @tail = SVG.get 'tail'
     .style "pointer-events: visiblefill;"
     @body = SVG.get 'body'
     .style "pointer-events: visiblefill;"
     @nose = SVG.get 'nose'
+    @nose_anchor = [
+      @nose.bbox().cx,
+      @nose.bbox().height + @nose.bbox().y,
+    ]
     @left_mouth = SVG.get 'left-mouth'
     @right_mouth = SVG.get 'right-mouth'
     @left_tooth = SVG.get 'left-tooth'
@@ -109,10 +117,18 @@ module.exports = class Bunny
   WiggleNose: (callback) ->
     angle = if Math.random() < 0.5 then -10 else 10
     @nose.animate @tail_twitch_speed
-    .during (v,m) => @nose.transform {rotation:m(0,angle),cx:210,cy:215,relative:false}
+    .during (v,m) => @nose.transform
+      rotation: m(0,angle)
+      cx: @nose_anchor[0]
+      cy: @nose_anchor[1]
+      relative: false
     .after =>
       @nose.animate @ear_twitch_speed, '-' #-: linear, <>: ease in/out, =: external, or a function for easing
-      .during (v,m) => @nose.transform {rotation:m(angle,0),cx:210,cy:215,relative:false}
+      .during (v,m) => @nose.transform
+        rotation: m(angle,0)
+        cx: @nose_anchor[0]
+        cy: @nose_anchor[1]
+        relative: false
       .after ->
         return callback?()
 
@@ -146,13 +162,17 @@ module.exports = class Bunny
 
    randomPosition: ->
       rect = @el.getBoundingClientRect()
-      x = Math.random() * (rect.width - 40*@Scale()) + 30*@Scale()
-      y = Math.random() * (rect.height - 115*@Scale()) + 40*@Scale()
+      # TODO use .x() and .y() to get top left corner instead of this
+      x = Math.random() * (rect.width - @gp.bbox().width*@Scale()/2) + @gp.bbox().width*@Scale()/2
+      y = Math.random() * (rect.height - @gp.bbox().height*@Scale()/2) + @gp.bbox().height*@Scale()/2
       return [x,y]
 
   setHeading: (x,y) ->
-    if (@gp.cx() > x and @bunny.transform().skewY isnt 0) or (@gp.cx() < x and @bunny.transform().skewY == 0)
-      @bunny.flip("x")
+    x0 =  @gp.transform().cx
+    facingRight = @inner_gp.transform().skewY isnt 0
+    if (x0 > x and facingRight) or (x0 < x and not facingRight)
+      @inner_gp.flip "x"
+      @speechText.flip "x"
 
   Walk: (callback, towardsMouse) ->
     if towardsMouse
@@ -160,17 +180,18 @@ module.exports = class Bunny
       y = MousePosition().y
     else
       [x,y] = @randomPosition()
-    return @WalkTo x, y, null, callback
+    return @WalkTo x, y, 100, callback
 
   #walks to the given position
   #treat like center = (x,y)
   WalkTo: (x,y,duration,callback) ->
+    console.log "walking to #{x} , #{y}"
     if not duration?
       d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
       duration = 1000 * d * 1.0 / @pixels_per_second
     @setHeading x, y
     @gp.animate duration
-    .dmove x - @gp.cx(), y - @gp.cy()
+    .transform x: x, y: y
     .after ->
       @walking = false
       return callback?()
