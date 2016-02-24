@@ -13,6 +13,7 @@ module.exports = class Bunny
     #timing in ms
     @blink_speed = 200
     @ear_twitch_speed = 200
+    @nose_wiggle_speed = 200
     @tail_twitch_speed = 200
     #animating monitoring
     @action_timer = null
@@ -28,19 +29,11 @@ module.exports = class Bunny
     .style "pointer-events: visiblefill;"
     @right_ear = SVG.get 'right-ear'
     .style "pointer-events: visiblefill;"
-    @ear_anchor = [
-      SVG.get('ear-group').bbox().cx,
-      SVG.get('ear-group').bbox().height + SVG.get('ear-group').bbox().y,
-    ]
     @tail = SVG.get 'tail'
     .style "pointer-events: visiblefill;"
     @body = SVG.get 'body'
     .style "pointer-events: visiblefill;"
     @nose = SVG.get 'nose'
-    @nose_anchor = [
-      @nose.bbox().cx,
-      @nose.bbox().height + @nose.bbox().y,
-    ]
     @left_mouth = SVG.get 'left-mouth'
     @right_mouth = SVG.get 'right-mouth'
     @left_tooth = SVG.get 'left-tooth'
@@ -116,19 +109,23 @@ module.exports = class Bunny
 
   WiggleNose: (callback) ->
     angle = if Math.random() < 0.5 then -10 else 10
-    @nose.animate @tail_twitch_speed
-    .during (v,m) => @nose.transform
-      rotation: m(0,angle)
-      cx: @nose_anchor[0]
-      cy: @nose_anchor[1]
-      relative: false
-    .after =>
-      @nose.animate @ear_twitch_speed, '-' #-: linear, <>: ease in/out, =: external, or a function for easing
-      .during (v,m) => @nose.transform
-        rotation: m(angle,0)
-        cx: @nose_anchor[0]
-        cy: @nose_anchor[1]
+    anchor = [@nose.bbox().cx,@nose.bbox().h+@nose.bbox().y]
+    @nose.animate @nose_wiggle_speed, '-'
+    .during (v,m) =>
+      @nose.transform
+        rotation: m(0,angle)
+        cx: anchor[0]
+        cy: anchor[1]
         relative: false
+    .after =>
+      #-: linear, <>: ease in/out, =: external, or a function for easing
+      @nose.animate @nose_wiggle_speed, '-'
+      .during (v,m) =>
+        @nose.transform
+          rotation: m(angle,0)
+          cx: anchor[0]
+          cy: anchor[1]
+          relative: false
       .after ->
         return callback?()
 
@@ -140,23 +137,25 @@ module.exports = class Bunny
   TwitchEar: (e,dir,callback) ->
     if not e?
       e = if Math.random() < 0.5 then @left_ear else @right_ear
+    anchor = [e.bbox().cx,e.bbox().cy]
     angle = 10 * (dir or if Math.random()<0.5 then 1 else -1)
     e.animate @ear_twitch_speed
-    .during (v,m) => e.transform {rotation:m(0,angle),cx:200,cy:100,relative:false}
+    .during (v,m) => e.transform {rotation:m(0,angle),cx:anchor[0],cy:anchor[1],relative:false}
     .after =>
       e.animate @ear_twitch_speed, '-' #-: linear, <>: ease in/out, =: external, or a function for easing
-      .during (v,m) => e.transform {rotation:m(angle,0),cx:200,cy:100,relative:false}
+      .during (v,m) => e.transform {rotation:m(angle,0),cx:anchor[0],cy:anchor[1],relative:false}
       .after ->
         return callback?()
 
   TwitchTail: (callback) ->
     angle = if Math.random() < 0.5 then 10 else -10
+    anchor = [@tail.bbox().x,@tail.bbox().cy]
     @tail.animate 150
-    .during (v,m) => @tail.transform {rotation:m(0,angle),cx:541,cy:200,relative: false}
+    .during (v,m) => @tail.transform {rotation:m(0,angle),cx:anchor[0],cy:anchor[1],relative: false}
     .rotate if Math.random() < 0.5 then 10 else -10
     .after =>
       @tail.animate @tail_twitch_speed, '-'
-      .during (v,m) => @tail.transform {rotation:m(angle,0),cx:541,cy:200,relative: false}
+      .during (v,m) => @tail.transform {rotation:m(angle,0),cx:anchor[0],cy:anchor[1],relative: false}
       .after ->
         return callback?()
 
@@ -180,7 +179,7 @@ module.exports = class Bunny
       y = MousePosition().y
     else
       [x,y] = @randomPosition()
-    return @WalkTo x, y, 100, callback
+    return @WalkTo x, y, null, callback
 
   #walks to the given position
   #treat like center = (x,y)
