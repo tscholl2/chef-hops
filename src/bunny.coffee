@@ -116,20 +116,12 @@ module.exports = class Bunny
     anchor = [@nose.bbox().cx,@nose.bbox().h+@nose.bbox().y]
     @nose.animate @nose_wiggle_speed, '-'
     .during (v,m) =>
-      @nose.transform
-        rotation: m(0,angle)
-        cx: anchor[0]
-        cy: anchor[1]
-        relative: false
+      @nose.transform {rotation:m(0,angle),cx:anchor[0],cy:anchor[1],relative:false}
     .after =>
-      #-: linear, <>: ease in/out, =: external, or a function for easing
+      # -: linear, <>: ease in/out, =: external, or a function for easing
       @nose.animate @nose_wiggle_speed, '-'
       .during (v,m) =>
-        @nose.transform
-          rotation: m(angle,0)
-          cx: anchor[0]
-          cy: anchor[1]
-          relative: false
+        @nose.transform {rotation:m(angle,0),cx:anchor[0],cy:anchor[1],relative:false}
       .after ->
         return callback?()
 
@@ -146,7 +138,7 @@ module.exports = class Bunny
     e.animate @ear_twitch_speed
     .during (v,m) => e.transform {rotation:m(0,angle),cx:anchor[0],cy:anchor[1],relative:false}
     .after =>
-      e.animate @ear_twitch_speed, '-' #-: linear, <>: ease in/out, =: external, or a function for easing
+      e.animate @ear_twitch_speed, '-' # -: linear, <>: ease in/out, =: external, or a function for easing
       .during (v,m) => e.transform {rotation:m(angle,0),cx:anchor[0],cy:anchor[1],relative:false}
       .after ->
         return callback?()
@@ -183,10 +175,9 @@ module.exports = class Bunny
       [x,y] = @randomPosition()
     return @WalkTo x, y, 100, callback
 
-  #walks to the given position
-  #treat like center = (x,y)
+  # walks to the given position
+  # treat like center = (x,y)
   WalkTo: (x,y,duration,callback) ->
-    console.log "walking to #{x} , #{y}"
     if not duration?
       d = Math.sqrt (x - @gp.x())*(x - @gp.x())+(y - @gp.y())*(y - @gp.y())
       duration = 1000 * d * 1.0 / @pixels_per_second
