@@ -38,6 +38,8 @@ module.exports =
     new webpack.HotModuleReplacementPlugin()
     new webpack.DefinePlugin
       'process.env': {'NODE_ENV': JSON.stringify('development')}
+    new webpack.optimize.UglifyJsPlugin
+      compress: true
   ]
   # see http://webpack.github.io/docs/configuration.html#devtool
   # for all the crazy options for `devtools` field

@@ -1,5 +1,4 @@
 svg = document.createElement "svg"
-svg.id = "svg1"
 svg.style.left = "0px"
 svg.style.top = "0px"
 svg.style.margin = "0px"

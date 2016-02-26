@@ -6,24 +6,25 @@ module.exports = class Bunny
   constructor: (@el) ->
     # scaled size
     @scale = 0.5 # use .Scale() method to change
-    #variable for speed, about ~ number of leg movements/second
+    # variable for speed, about ~ number of leg movements/second
     @leg_actions_per_second = 1.08
-    #movment, about ~ 1px / second
+    # movment, about ~ 1px / second
     @pixels_per_second = 30.14
-    #timing in ms
+    # timing in ms
     @blink_speed = 200
     @ear_twitch_speed = 200
     @nose_wiggle_speed = 200
     @tail_twitch_speed = 200
-    #animating monitoring
+    # animating monitoring
     @action_timer = null
-    #svg element functions
+    # svg element functions
     @draw = SVG @el
     @gp = @draw.group()
     # load svg
     @draw.svg RAW_SVG
     @gp = SVG.get "group"
     @inner_gp = SVG.get "inner-group"
+    @outer_gp = SVG.get "outer-group"
     # body parts
     @left_ear = SVG.get 'left-ear'
     .style "pointer-events: visiblefill;"
@@ -54,6 +55,9 @@ module.exports = class Bunny
     @chef_hat = SVG.get 'hat'
     @gp.scale @scale
     .style "display: block"
+    # bounding box
+    @w = @tail.bbox().x + @tail.bbox().w
+    @h = @front_left_leg.bbox().y + @front_left_leg.bbox().h
 
   onClick: (callback) ->
     @gp.click callback
@@ -159,36 +163,34 @@ module.exports = class Bunny
       .after ->
         return callback?()
 
-   randomPosition: ->
-      rect = @el.getBoundingClientRect()
-      # TODO use .x() and .y() to get top left corner instead of this
-      x = Math.random() * (rect.width - @gp.bbox().width*@Scale()/2) + @gp.bbox().width*@Scale()/2
-      y = Math.random() * (rect.height - @gp.bbox().height*@Scale()/2) + @gp.bbox().height*@Scale()/2
-      return [x,y]
+  randomPosition: ->
+    x = Math.random() * (@el.clientWidth - @w*@Scale())
+    y = Math.random() * (@el.clientHeight - @h*@Scale())
+    return [x,y]
 
-  setHeading: (x,y) ->
-    x0 =  @gp.transform().cx
-    facingRight = @inner_gp.transform().skewY isnt 0
+  setHeading: (x) ->
+    x0 =  @gp.transform().x
+    facingRight = @outer_gp.transform().skewY isnt 0
     if (x0 > x and facingRight) or (x0 < x and not facingRight)
-      @inner_gp.flip "x"
+      @outer_gp.flip "x"
       @speechText.flip "x"
 
   Walk: (callback, towardsMouse) ->
     if towardsMouse
-      x = MousePosition().x
-      y = MousePosition().y
+      x = MousePosition().x - @w/2
+      y = MousePosition().y - @h/2
     else
       [x,y] = @randomPosition()
-    return @WalkTo x, y, null, callback
+    return @WalkTo x, y, 100, callback
 
   #walks to the given position
   #treat like center = (x,y)
   WalkTo: (x,y,duration,callback) ->
     console.log "walking to #{x} , #{y}"
     if not duration?
-      d = Math.sqrt (x - @gp.cx())*(x - @gp.cx())+(y - @gp.cy())*(y - @gp.cy())
+      d = Math.sqrt (x - @gp.x())*(x - @gp.x())+(y - @gp.y())*(y - @gp.y())
       duration = 1000 * d * 1.0 / @pixels_per_second
-    @setHeading x, y
+    @setHeading x
     @gp.animate duration
     .transform x: x, y: y
     .after ->
