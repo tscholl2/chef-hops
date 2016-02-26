@@ -173,7 +173,7 @@ module.exports = class Bunny
       y = MousePosition().y - @h/2
     else
       [x,y] = @randomPosition()
-    return @WalkTo x, y, 100, callback
+    return @WalkTo x, y, null, callback
 
   # walks to the given position
   # treat like center = (x,y)
