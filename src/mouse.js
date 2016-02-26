@@ -3,7 +3,7 @@ var mouseY = 0;
 
 (function() {
 	document.onmousemove = function(event) {
-		var dot, eventDoc, doc, body, pageX, pageY;
+		var eventDoc, doc, body;
 
 		event = event || window.event; // IE-ism
 
