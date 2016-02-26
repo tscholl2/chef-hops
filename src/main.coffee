@@ -11,7 +11,7 @@ svg.style.zIndex = "9999999"
 svg.style.pointerEvents = "none"
 document.body.appendChild svg
 
-Bunny = require './Bunny'
+Bunny = require './bunny'
 b = new Bunny svg
 b.Scale 0.5
 b.ActNatural()
