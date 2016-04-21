@@ -3,7 +3,7 @@
   "author": "tscholl2",
   "browser": "./src/main.coffee",
   "dependencies": {
-    "svg.js": "^2.2.4"
+    "svg.js": "2.2.5"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",
