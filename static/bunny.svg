@@ -92,14 +92,14 @@
     </g>
     <ellipse id="body" cx="0" cy="0" rx="400" ry="250" fill="#a0d"/>
     <g id="eyes">
-      <circle id="right-eye" cx="250" cy="-100" r="45" fill="#fff"/>
-      <circle id="right-pupil" cx="250" cy="-100" r="5" fill="#000"/>
-      <path id="right-eye-closed" d="M 205 -100 h 90"/>
-      <circle id="left-eye" cx="150" cy="-100" r="45" fill="#fff"/>
-      <circle id="left-pupil" cx="150" cy="-100" r="5" fill="#000"/>
-      <path id="left-eye-closed" d="M 105 -100 h 90"/>
+      <circle id="right-eye" cx="255" cy="-100" r="45" fill="#fff"/>
+      <circle id="right-pupil" cx="255" cy="-100" r="5" fill="#000"/>
+      <path id="right-eye-closed" d="M 210 -100 h 90"/>
+      <circle id="left-eye" cx="145" cy="-100" r="45" fill="#fff"/>
+      <circle id="left-pupil" cx="145" cy="-100" r="5" fill="#000"/>
+      <path id="left-eye-closed" d="M 100 -100 h 90"/>
     </g>
-    <path id="nose" d="M175 -50 h 50 l -25 25 z" fill="#f05"/>
+    <path id="nose" d="M175 -40 h 50 l -25 25 z" fill="#f05"/>
     <g id="hat" fill="#fff">
       <rect id="hat-base" x="125" y="-375" width="150" height="200" />
       <ellipse id="hat-top-1" cx="200" cy="-375" rx="200" ry="75" />
