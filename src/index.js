@@ -130,6 +130,7 @@ const Bunny = function() {
     blink: () => toggleClass(svg.querySelector("#eyes"), "blink", 200),
     wiggleNose: () => toggleClass(svg.querySelector("#nose"), "wiggle", 500),
     wiggleTail: () => toggleClass(svg.querySelector("#tail"), "wiggle", 750),
+    wiggleEars: () => toggleClass(svg.querySelector("#ears"),"wiggle", 500),
   };
 };
 

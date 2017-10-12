@@ -83,7 +83,7 @@
   transform-origin: 50% 100%;
 }
 #ears.wiggle>path {
-  animation: rotate10 0.75s linear 0s;
+  animation: rotate10 0.5s linear 0s;
 }
 
 </style>
