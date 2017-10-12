@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 2000 1000">
 <style type="text/css">
-@keyframes walk {
+@keyframes rotate10 {
   0% {
     transform: rotate(0deg)
   }
@@ -20,16 +20,16 @@
   transform-origin: 0% 0%;
 }
 #legs.walk #front-right-leg {
-  animation: walk 2s linear 0s infinite reverse;
+  animation: rotate10 2s linear 0s infinite reverse;
 }
 #legs.walk #front-left-leg {
-  animation: walk 2s linear 1s infinite reverse;
+  animation: rotate10 2s linear 1s infinite reverse;
 }
 #legs.walk #back-right-leg {
-  animation: walk 2s linear 0s infinite;
+  animation: rotate10 2s linear 0s infinite;
 }
 #legs.walk #back-left-leg {
-  animation: walk 2s linear 1s infinite;
+  animation: rotate10 2s linear 1s infinite;
 }
 #legs > path {
   transform-box: fill-box;
@@ -46,7 +46,7 @@
   display: none;
 }
 
-@keyframes wiggle {
+@keyframes rotate20 {
   0% {
     transform: rotate(0deg)
   }
@@ -66,7 +66,7 @@
   transform-origin: 50% 50%;
 }
 #nose.wiggle {
-  animation: wiggle 0.5s linear 0s;
+  animation: rotate20 0.5s linear 0s;
 }
 
 
@@ -75,8 +75,17 @@
   transform-origin: 62% 50%;
 }
 #tail.wiggle {
-  animation: wiggle 0.75s linear 0s infinite;
+  animation: rotate20 0.75s linear 0s infinite;
 }
+
+#ears>path {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+#ears.wiggle>path {
+  animation: rotate10 0.75s linear 0s;
+}
+
 </style>
   <g id="group" stroke-width="10" stroke="#000">
     <g id="ears">
