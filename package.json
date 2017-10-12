@@ -1,7 +1,7 @@
 {
-  "name": "bunny",
+  "name": "chef-hops",
   "author": "tscholl2",
-  "browser": "./src/main.coffee",
+  "browser": "./src/index.js",
   "dependencies": {
     "svg.js": "2.2.5"
   },
