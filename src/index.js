@@ -148,8 +148,6 @@ document.body.appendChild(svg);
 
 const Bunny = function (svg) {
 
-  const position = [0, 0];
-  const destination = [0, 0];
   const transform1 = svg.createSVGTransform();
   const transform2 = svg.createSVGTransform();
   const transform3 = svg.createSVGTransform();
@@ -162,16 +160,20 @@ const Bunny = function (svg) {
     speed: 0.1, // units/ms
     animation: undefined,
     svg,
-    destination,
-    position,
+    destination: [0, 0],
+    position: [0, 0],
+    facing: 1, // 1 for right -1 for left
     transform1,
     transform2,
     transform3,
     // methods
-    flip: (() => { let t = 1; return () => transform2.setScale(t = -t, 1) })(),
+    flip: () => {
+      self.facing = -1 * self.facing;
+      self.transform2.setScale(self.facing, 1);
+    },
     scale: (sx = 1, sy) => {
       sy = sy || sx;
-      transform3.setScale(sx, sy);
+      self.transform3.setScale(sx, sy);
     },
     startWalking: () => svg.querySelector("#legs").classList.add("walk"),
     stopWalking: () => svg.querySelector("#legs").classList.remove("walk"),
@@ -182,7 +184,10 @@ const Bunny = function (svg) {
     openMouth: () => svg.querySelector("#mouth").classList.add("open"),
     closeMouth: () => svg.querySelector("#mouth").classList.remove("open"),
     startMoving: (x, y) => {
-      [destination[0], destination[1]] = [x, y];
+      [self.destination[0], self.destination[1]] = [x, y];
+      if ((x - self.position[0]) * self.facing < 0) {
+        self.flip();
+      }
       updatePosition.lastUpdate = undefined;
       animation = window.requestAnimationFrame(step);
     },
@@ -205,7 +210,7 @@ const Bunny = function (svg) {
 
 
   function step(timestamp) {
-    if (distance(position, destination) != 0) {
+    if (distance(self.position, self.destination) != 0) {
       updatePosition(timestamp);
       self.animation = window.requestAnimationFrame(step);
     } else {
@@ -216,15 +221,15 @@ const Bunny = function (svg) {
   function updatePosition(now) {
     const then = updatePosition.lastUpdate || now;
     const v = [
-      destination[0] - position[0],
-      destination[1] - position[1],
+      self.destination[0] - self.position[0],
+      self.destination[1] - self.position[1],
     ];
     const s = (now - then) * self.speed
     const m = Math.max(distance(v, [0, 0]), s);
     if (m > 0 && !(v[0] == 0 && v[1] == 0)) {
-      position[0] += s * v[0] / m;
-      position[1] += s * v[1] / m;
-      transform1.setTranslate(position[0], position[1]);
+      self.position[0] += s * v[0] / m;
+      self.position[1] += s * v[1] / m;
+      self.transform1.setTranslate(self.position[0], self.position[1]);
     }
     updatePosition.lastUpdate = now;
   }
