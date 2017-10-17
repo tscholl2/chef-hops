@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 2000 1000">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 2000 800">
 <style type="text/css">
 @keyframes rotate10 {
   0% {
@@ -86,6 +86,21 @@
   animation: rotate10 0.5s linear 0s;
 }
 
+#mouth>ellipse {
+  display:none;
+}
+#mouth.open>path {
+  display:none;
+}
+#mouth.open>ellipse {
+  display:inherit;
+}
+
+#speech>text {
+  font-family: monospace;
+  font-size: 6em;
+}
+
 </style>
   <g id="group" stroke-width="10" stroke="#000">
     <g id="ears">
@@ -110,8 +125,17 @@
     </g>
     <path id="nose" d="M175 -40 h 50 l -25 25 z" fill="#f05"/>
     <g id="hat" fill="#fff">
-      <rect id="hat-base" x="125" y="-375" width="150" height="200" />
+      <rect id="hat-base" x="100" y="-375" width="200" height="200" />
       <ellipse id="hat-top-1" cx="200" cy="-375" rx="200" ry="75" />
+    </g>
+    <g id="mouth">
+      <ellipse id="mouth-open" cx="200" cy="30" rx="80" ry="20" />
+      <path id="mouth-closed" d="M 145 20 h 110 " />
+    </g>
+    <g id="speech">
+      <text x="500" y="-200">
+        <!--tspan>hello world</tspan-->
+      </text>
     </g>
   </g>
 </svg>
