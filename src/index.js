@@ -183,6 +183,10 @@ const Bunny = function (svg) {
     wiggleEars: () => toggleClass(svg.querySelector("#ears"), "wiggle", 500),
     openMouth: () => svg.querySelector("#mouth").classList.add("open"),
     closeMouth: () => svg.querySelector("#mouth").classList.remove("open"),
+    getCenterOnPage: () => {
+      const { left, top, width, height } = svg.querySelector("#body").getBoundingClientRect();
+      return [left + width / 2, top + height / 2];
+    },
     startMoving: (x, y) => {
       [self.destination[0], self.destination[1]] = [x, y];
       if ((x - self.position[0]) * self.facing < 0) {
@@ -270,3 +274,14 @@ const Bunny = function (svg) {
  */
 
 window.b = Bunny(svg);
+
+
+function MouseHandler(event) {
+  MouseHandler.P[0] = event.pageX;
+  MouseHandler.P[1] = event.pageY;
+}
+MouseHandler.P = [0, 0];
+function getMousePosition() {
+  return MouseHandler.P;
+}
+document.addEventListener("mousemove", MouseHandler);
