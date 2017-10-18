@@ -143,11 +143,12 @@ container.innerHTML = `
 </svg>
 `;
 const svg = container.children[0];
-svg.style.cssText = "left:0;top:0;margin:0;overflow:hidden;height:100vh;width:100vw;position:absolute;z-index:9999999;pointer-events:none;";
+svg.style.cssText =
+  "left:0;top:0;margin:0;overflow:hidden;height:100vh;width:100vw;position:absolute;z-index:9999999;pointer-events:none;";
 document.body.appendChild(svg);
 
-const Bunny = function (svg) {
-
+const Bunny = function(svg) {
+  // these come from the viewbox
   const SVGMINX = -500;
   const SVGMINY = -500;
   const SVGWIDTH = 2000;
@@ -161,7 +162,6 @@ const Bunny = function (svg) {
   svg.querySelector("#group").transform.baseVal.appendItem(transform3);
 
   const self = {
-    // attributes
     speed: 0.1, // units/ms
     animation: undefined,
     svg,
@@ -171,7 +171,6 @@ const Bunny = function (svg) {
     transform1,
     transform2,
     transform3,
-    // methods
     flip: () => {
       self.facing = -1 * self.facing;
       self.transform2.setScale(self.facing, 1);
@@ -189,28 +188,17 @@ const Bunny = function (svg) {
     openMouth: () => svg.querySelector("#mouth").classList.add("open"),
     closeMouth: () => svg.querySelector("#mouth").classList.remove("open"),
     pageCoordinatesToSVGCoordinatesTransformation: () => {
-      const bcr = self.svg.getBoundingClientRect();
-      // page points
-      const P = [
-        [bcr.left, bcr.left + bcr.width],
-        [bcr.top, bcr.top + bcr.height],
-      ];
-      // svg points
-      const Q = [
-        [SVGMINX, SVGMINX + SVGWIDTH],
-        [SVGMINY, SVGMINY + SVGHEIGHT],
-      ];
-      // transform
-      return (A) => [
+      const { left, width, top, height } = self.svg.getBoundingClientRect();
+      const P = [[left, left + width], [top, top + height]];
+      const { x, y, width: svgw, height: svgh } = self.svg.viewBox.baseVal;
+      const Q = [[x, x + svgw], [y, y + svgh]];
+      return A => [
         (Q[0][1] - Q[0][0]) / (P[0][1] - P[0][0]) * (A[0] - P[0][0]) + Q[0][0],
         (Q[1][1] - Q[1][0]) / (P[1][1] - P[1][0]) * (A[1] - P[1][0]) + Q[1][0],
       ];
     },
-    pageCoordinatesToSVGCoordinates: (P) => {
-      const T = self.pageCoordinatesToSVGCoordinatesTransformation();
-      return T(P);
-    },
-    startMoving: (Q) => {
+    pageCoordinatesToSVGCoordinates: P => self.pageCoordinatesToSVGCoordinatesTransformation()(P),
+    startMoving: Q => {
       [self.destination[0], self.destination[1]] = Q;
       if ((Q[0] - self.position[0]) * self.facing < 0) {
         self.flip();
@@ -228,12 +216,12 @@ const Bunny = function (svg) {
         if (self.acting) {
           setTimeout(foo, Math.random() * 1000 + 750);
         }
-      }
+      };
       foo();
     },
-    stopActingNatural: () => self.acting = false,
+    stopActingNatural: () => (self.acting = false),
     naturalAction: () => {
-      const x = Math.random()
+      const x = Math.random();
       if (x < 0.2) {
         return self.wiggleNose;
       }
@@ -254,7 +242,6 @@ const Bunny = function (svg) {
   };
   return self;
 
-
   function step(timestamp) {
     if (distance(self.position, self.destination) != 0) {
       updatePosition(timestamp);
@@ -267,11 +254,8 @@ const Bunny = function (svg) {
 
   function updatePosition(now) {
     const then = updatePosition.lastUpdate || now;
-    const v = [
-      self.destination[0] - self.position[0],
-      self.destination[1] - self.position[1],
-    ];
-    const s = (now - then) * self.speed
+    const v = [self.destination[0] - self.position[0], self.destination[1] - self.position[1]];
+    const s = (now - then) * self.speed;
     const m = Math.max(distance(v, [0, 0]), s);
     if (m > 0 && !(v[0] == 0 && v[1] == 0)) {
       self.position[0] += s * v[0] / m;
@@ -294,12 +278,8 @@ const Bunny = function (svg) {
   }
 
   function getRandomPosition() {
-    return [
-      document.body.clientWidth * Math.random(),
-      document.body.clientHeight * Math.random(),
-    ];
+    return [document.body.clientWidth * Math.random(), document.body.clientHeight * Math.random()];
   }
-
 };
 
 window.b = Bunny(svg);
@@ -314,4 +294,4 @@ function getMousePosition() {
   return MouseHandler.P;
 }
 document.addEventListener("mousemove", MouseHandler);
-document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()))
+document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()));
