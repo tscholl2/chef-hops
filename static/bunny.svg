@@ -20,16 +20,16 @@
   transform-origin: 0% 0%;
 }
 #legs.walk #front-right-leg {
-  animation: rotate10 2s linear 0s infinite reverse;
+  animation: rotate10 1.5s linear 0s infinite reverse;
 }
 #legs.walk #front-left-leg {
-  animation: rotate10 2s linear 1s infinite reverse;
+  animation: rotate10 1.5s linear 1s infinite reverse;
 }
 #legs.walk #back-right-leg {
-  animation: rotate10 2s linear 0s infinite;
+  animation: rotate10 1.5s linear 0s infinite;
 }
 #legs.walk #back-left-leg {
-  animation: rotate10 2s linear 1s infinite;
+  animation: rotate10 1.5s linear 1s infinite;
 }
 #legs > path {
   transform-box: fill-box;

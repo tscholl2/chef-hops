@@ -22,16 +22,16 @@ container.innerHTML = `
   transform-origin: 0% 0%;
 }
 #legs.walk #front-right-leg {
-  animation: rotate10 2s linear 0s infinite reverse;
+  animation: rotate10 1.5s linear 0s infinite reverse;
 }
 #legs.walk #front-left-leg {
-  animation: rotate10 2s linear 1s infinite reverse;
+  animation: rotate10 1.5s linear 1s infinite reverse;
 }
 #legs.walk #back-right-leg {
-  animation: rotate10 2s linear 0s infinite;
+  animation: rotate10 1.5s linear 0s infinite;
 }
 #legs.walk #back-left-leg {
-  animation: rotate10 2s linear 1s infinite;
+  animation: rotate10 1.5s linear 1s infinite;
 }
 #legs > path {
   transform-box: fill-box;
@@ -148,6 +148,11 @@ document.body.appendChild(svg);
 
 const Bunny = function (svg) {
 
+  const SVGMINX = -500;
+  const SVGMINY = -500;
+  const SVGWIDTH = 2000;
+  const SVGHEIGHT = 800;
+
   const transform1 = svg.createSVGTransform();
   const transform2 = svg.createSVGTransform();
   const transform3 = svg.createSVGTransform();
@@ -183,17 +188,36 @@ const Bunny = function (svg) {
     wiggleEars: () => toggleClass(svg.querySelector("#ears"), "wiggle", 500),
     openMouth: () => svg.querySelector("#mouth").classList.add("open"),
     closeMouth: () => svg.querySelector("#mouth").classList.remove("open"),
-    getCenterOnPage: () => {
-      const { left, top, width, height } = svg.querySelector("#body").getBoundingClientRect();
-      return [left + width / 2, top + height / 2];
+    pageCoordinatesToSVGCoordinatesTransformation: () => {
+      const bcr = self.svg.getBoundingClientRect();
+      // page points
+      const P = [
+        [bcr.left, bcr.left + bcr.width],
+        [bcr.top, bcr.top + bcr.height],
+      ];
+      // svg points
+      const Q = [
+        [SVGMINX, SVGMINX + SVGWIDTH],
+        [SVGMINY, SVGMINY + SVGHEIGHT],
+      ];
+      // transform
+      return (A) => [
+        (Q[0][1] - Q[0][0]) / (P[0][1] - P[0][0]) * (A[0] - P[0][0]) + Q[0][0],
+        (Q[1][1] - Q[1][0]) / (P[1][1] - P[1][0]) * (A[1] - P[1][0]) + Q[1][0],
+      ];
     },
-    startMoving: (x, y) => {
-      [self.destination[0], self.destination[1]] = [x, y];
-      if ((x - self.position[0]) * self.facing < 0) {
+    pageCoordinatesToSVGCoordinates: (P) => {
+      const T = self.pageCoordinatesToSVGCoordinatesTransformation();
+      return T(P);
+    },
+    startMoving: (Q) => {
+      [self.destination[0], self.destination[1]] = Q;
+      if ((Q[0] - self.position[0]) * self.facing < 0) {
         self.flip();
       }
       updatePosition.lastUpdate = undefined;
       animation = window.requestAnimationFrame(step);
+      self.startWalking();
     },
     stopMoving: () => window.cancelAnimationFrame(animation),
     naturalAction: () => {
@@ -218,6 +242,7 @@ const Bunny = function (svg) {
       updatePosition(timestamp);
       self.animation = window.requestAnimationFrame(step);
     } else {
+      self.stopWalking();
       self.animation = undefined;
     }
   }
@@ -281,7 +306,9 @@ function MouseHandler(event) {
   MouseHandler.P[1] = event.pageY;
 }
 MouseHandler.P = [0, 0];
+
 function getMousePosition() {
   return MouseHandler.P;
 }
 document.addEventListener("mousemove", MouseHandler);
+document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()))
