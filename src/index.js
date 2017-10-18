@@ -220,8 +220,23 @@ const Bunny = function (svg) {
       self.startWalking();
     },
     stopMoving: () => window.cancelAnimationFrame(animation),
+    acting: false,
+    startActingNatural: () => {
+      self.acting = true;
+      const foo = () => {
+        self.naturalAction()();
+        if (self.acting) {
+          setTimeout(foo, Math.random() * 1000 + 750);
+        }
+      }
+      foo();
+    },
+    stopActingNatural: () => self.acting = false,
     naturalAction: () => {
       const x = Math.random()
+      if (x < 0.2) {
+        return self.wiggleNose;
+      }
       if (x < 0.3) {
         return self.blink;
       }
@@ -231,7 +246,10 @@ const Bunny = function (svg) {
       if (x < 0.7) {
         return self.wiggleEars;
       }
-      return self.startWalking;
+      if (x < 0.8) {
+        return () => self.startMoving(self.pageCoordinatesToSVGCoordinates(getRandomPosition()));
+      }
+      return () => self.startMoving(self.pageCoordinatesToSVGCoordinates(getMousePosition()));
     },
   };
   return self;
@@ -275,31 +293,16 @@ const Bunny = function (svg) {
     return Math.sqrt((P[0] - Q[0]) ** 2 + (P[1] - Q[1]) ** 2);
   }
 
+  function getRandomPosition() {
+    return [
+      document.body.clientWidth * Math.random(),
+      document.body.clientHeight * Math.random(),
+    ];
+  }
+
 };
 
-
-/**
-  regularActions: -> [
-    (callback) => @Blink callback
-    (callback) => @Blink callback
-    (callback) => @Blink callback
-    (callback) => @TwitchTail callback
-    (callback) => @TwitchTail callback
-    (callback) => @WiggleNose callback
-    (callback) => @WiggleNose callback
-    (callback) => @TwitchEars callback
-    (callback) => @TwitchEars callback
-    (callback) => @Walk callback
-  ]
-
-  ActNatural: () ->
-    @regularActions()[Math.floor (Math.random() * @regularActions().length)]()
-    @action_timer = setTimeout (=> @ActNatural()), Math.random() * 1000 + 750
-
- */
-
 window.b = Bunny(svg);
-
 
 function MouseHandler(event) {
   MouseHandler.P[0] = event.pageX;

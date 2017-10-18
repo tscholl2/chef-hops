@@ -1,15 +1,11 @@
 {
   "name": "chef-hops",
+  "version": "0.2.0",
   "author": "tscholl2",
-  "browser": "./src/index.js",
-  "dependencies": {
-    "svg.js": "2.2.5"
+  "scripts": {
+    "lint": "prettier --trailing-comma all --print-width 100 --write \"src/**/*.js\""
   },
   "devDependencies": {
-    "coffee-script": "^1.10.0",
-    "webpack": "^1.12.2",
-    "coffee-loader": "^0.7.2",
-    "raw-loader": "^0.5.1",
-    "webpack-dev-server": "^1.12.1"
+    "prettier": "^1.7.4"
   }
 }
