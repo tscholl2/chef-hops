@@ -147,151 +147,163 @@ svg.style.cssText =
   "left:0;top:0;margin:0;overflow:hidden;height:100vh;width:100vw;position:absolute;z-index:9999999;pointer-events:none;";
 document.body.appendChild(svg);
 
-const Bunny = function(svg) {
-  // these come from the viewbox
-  const SVGMINX = -500;
-  const SVGMINY = -500;
-  const SVGWIDTH = 2000;
-  const SVGHEIGHT = 800;
+class Bun {
+  /**
+   * Bunny class. Draws and controls a bunny on an SVG element.
+   * @param {SVGElement} svg
+   */
+  constructor(svg) {
 
-  const transform1 = svg.createSVGTransform();
-  const transform2 = svg.createSVGTransform();
-  const transform3 = svg.createSVGTransform();
-  svg.querySelector("#group").transform.baseVal.appendItem(transform1);
-  svg.querySelector("#group").transform.baseVal.appendItem(transform2);
-  svg.querySelector("#group").transform.baseVal.appendItem(transform3);
-
-  const self = {
-    speed: 0.1, // units/ms
-    animation: undefined,
-    svg,
-    destination: [0, 0],
-    position: [0, 0],
-    facing: 1, // 1 for right -1 for left
-    transform1,
-    transform2,
-    transform3,
-    flip: () => {
-      self.facing = -1 * self.facing;
-      self.transform2.setScale(self.facing, 1);
-    },
-    scale: (sx = 1, sy) => {
-      sy = sy || sx;
-      self.transform3.setScale(sx, sy);
-    },
-    startWalking: () => svg.querySelector("#legs").classList.add("walk"),
-    stopWalking: () => svg.querySelector("#legs").classList.remove("walk"),
-    blink: () => toggleClass(svg.querySelector("#eyes"), "blink", 200),
-    wiggleNose: () => toggleClass(svg.querySelector("#nose"), "wiggle", 500),
-    wiggleTail: () => toggleClass(svg.querySelector("#tail"), "wiggle", 750),
-    wiggleEars: () => toggleClass(svg.querySelector("#ears"), "wiggle", 500),
-    openMouth: () => svg.querySelector("#mouth").classList.add("open"),
-    closeMouth: () => svg.querySelector("#mouth").classList.remove("open"),
-    pageCoordinatesToSVGCoordinatesTransformation: () => {
-      const { left, width, top, height } = self.svg.getBoundingClientRect();
-      const P = [[left, left + width], [top, top + height]];
-      const { x, y, width: svgw, height: svgh } = self.svg.viewBox.baseVal;
-      const Q = [[x, x + svgw], [y, y + svgh]];
-      return A => [
-        (Q[0][1] - Q[0][0]) / (P[0][1] - P[0][0]) * (A[0] - P[0][0]) + Q[0][0],
-        (Q[1][1] - Q[1][0]) / (P[1][1] - P[1][0]) * (A[1] - P[1][0]) + Q[1][0],
-      ];
-    },
-    pageCoordinatesToSVGCoordinates: P => self.pageCoordinatesToSVGCoordinatesTransformation()(P),
-    startMoving: Q => {
-      [self.destination[0], self.destination[1]] = Q;
-      if ((Q[0] - self.position[0]) * self.facing < 0) {
-        self.flip();
+    this.svg = svg;
+    this.transform1 = this.svg.createSVGTransform();
+    this.transform2 = this.svg.createSVGTransform();
+    this.transform3 = this.svg.createSVGTransform();
+    this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform1);
+    this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform2);
+    this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform3);
+    this.speed = 0.1; // units/ms
+    this.animation = undefined;
+    this.destination = [0, 0];
+    this.position = [0, 0];
+    this.facing = 1; // 1 for right -1 for left
+    this.acting = false;
+  }
+  flip() {
+    this.facing = -1 * this.facing;
+    this.transform2.setScale(this.facing, 1);
+  }
+  scale(sx = 1, sy) {
+    sy = sy || sx;
+    this.transform3.setScale(sx, sy);
+  }
+  startWalking() {
+    this.svg.querySelector("#legs").classList.add("walk");
+  }
+  stopWalking() {
+    this.svg.querySelector("#legs").classList.remove("walk");
+  }
+  blink() {
+    toggleClass(this.svg.querySelector("#eyes"), "blink", 200);
+  }
+  wiggleNose() {
+    toggleClass(this.svg.querySelector("#nose"), "wiggle", 500);
+  }
+  wiggleTail() {
+    toggleClass(this.svg.querySelector("#tail"), "wiggle", 750);
+  }
+  wiggleEars() {
+    toggleClass(this.svg.querySelector("#ears"), "wiggle", 500);
+  }
+  openMouth() {
+    this.svg.querySelector("#mouth").classList.add("open");
+  }
+  closeMouth() {
+    this.svg.querySelector("#mouth").classList.remove("open");
+  }
+  pageCoordinatesToSVGCoordinatesTransformation() {
+    const { left, width, top, height } = this.svg.getBoundingClientRect();
+    const P = [[left, left + width], [top, top + height]];
+    const { x, y, width: svgw, height: svgh } = this.svg.viewBox.baseVal;
+    const Q = [[x, x + svgw], [y, y + svgh]];
+    return A => [
+      (Q[0][1] - Q[0][0]) / (P[0][1] - P[0][0]) * (A[0] - P[0][0]) + Q[0][0],
+      (Q[1][1] - Q[1][0]) / (P[1][1] - P[1][0]) * (A[1] - P[1][0]) + Q[1][0],
+    ];
+  }
+  pageCoordinatesToSVGCoordinates(P) {
+    return this.pageCoordinatesToSVGCoordinatesTransformation()(P);
+  }
+  startMoving(Q) {
+    [this.destination[0], this.destination[1]] = Q;
+    if ((Q[0] - this.position[0]) * this.facing < 0) {
+      this.flip();
+    }
+    this.updatePosition.lastUpdate = undefined;
+    this.animation = window.requestAnimationFrame((...args) => this.step(...args));
+    this.startWalking();
+  }
+  stopMoving() {
+    window.cancelAnimationFrame(this.animation)
+  }
+  startActingNatural() {
+    this.acting = true;
+    const foo = () => {
+      this.naturalAction()();
+      if (this.acting) {
+        setTimeout(foo, Math.random() * 1000 + 750);
       }
-      updatePosition.lastUpdate = undefined;
-      animation = window.requestAnimationFrame(step);
-      self.startWalking();
-    },
-    stopMoving: () => window.cancelAnimationFrame(animation),
-    acting: false,
-    startActingNatural: () => {
-      self.acting = true;
-      const foo = () => {
-        self.naturalAction()();
-        if (self.acting) {
-          setTimeout(foo, Math.random() * 1000 + 750);
-        }
-      };
-      foo();
-    },
-    stopActingNatural: () => (self.acting = false),
-    naturalAction: () => {
-      const x = Math.random();
-      if (x < 0.2) {
-        return self.wiggleNose;
-      }
-      if (x < 0.3) {
-        return self.blink;
-      }
-      if (x < 0.5) {
-        return self.wiggleTail;
-      }
-      if (x < 0.7) {
-        return self.wiggleEars;
-      }
-      if (x < 0.8) {
-        return () => self.startMoving(self.pageCoordinatesToSVGCoordinates(getRandomPosition()));
-      }
-      return () => self.startMoving(self.pageCoordinatesToSVGCoordinates(getMousePosition()));
-    },
-  };
-  return self;
-
-  function step(timestamp) {
-    if (distance(self.position, self.destination) != 0) {
-      updatePosition(timestamp);
-      self.animation = window.requestAnimationFrame(step);
+    };
+    foo();
+  }
+  stopActingNatural() {
+    this.acting = false;
+  }
+  naturalAction() {
+    const x = Math.random();
+    if (x < 0.2) {
+      return () => this.wiggleNose();
+    }
+    if (x < 0.3) {
+      return () => this.blink();
+    }
+    if (x < 0.5) {
+      return () => this.wiggleTail();
+    }
+    if (x < 0.7) {
+      return () => this.wiggleEars();
+    }
+    if (x < 0.8) {
+      return () => this.startMoving(this.pageCoordinatesToSVGCoordinates(getRandomPosition()));
+    }
+    return () => this.startMoving(this.pageCoordinatesToSVGCoordinates(getMousePosition()));
+  }
+  step(timestamp) {
+    if (this.position[0] != this.destination[0] || this.position[1] != this.destination[1]) {
+      this.updatePosition(timestamp);
+      this.animation = window.requestAnimationFrame((...args) => this.step(...args));
     } else {
-      self.stopWalking();
-      self.animation = undefined;
+      this.stopWalking();
+      this.animation = undefined;
     }
   }
-
-  function updatePosition(now) {
-    const then = updatePosition.lastUpdate || now;
-    const v = [self.destination[0] - self.position[0], self.destination[1] - self.position[1]];
-    const s = (now - then) * self.speed;
-    const m = Math.max(distance(v, [0, 0]), s);
+  updatePosition(now) {
+    const then = this.updatePosition.lastUpdate || now;
+    const v = [this.destination[0] - this.position[0], this.destination[1] - this.position[1]];
+    const s = (now - then) * this.speed;
+    const d = Math.sqrt(v[0] ** 2 + v[1] ** 2);
+    const m = Math.max(d, s);
     if (m > 0 && !(v[0] == 0 && v[1] == 0)) {
-      self.position[0] += s * v[0] / m;
-      self.position[1] += s * v[1] / m;
-      self.transform1.setTranslate(self.position[0], self.position[1]);
+      this.position[0] += s * v[0] / m;
+      this.position[1] += s * v[1] / m;
+      this.transform1.setTranslate(this.position[0], this.position[1]);
     }
-    updatePosition.lastUpdate = now;
+    this.updatePosition.lastUpdate = now;
   }
+}
 
-  function toggleClass(el, className, milliseconds) {
-    if (el.length === undefined) {
-      el = [el];
-    }
-    el.forEach(e => e.classList.add(className));
-    setTimeout(() => el.forEach(e => e.classList.remove(className)), milliseconds);
-  }
-
-  function distance(P, Q) {
-    return Math.sqrt((P[0] - Q[0]) ** 2 + (P[1] - Q[1]) ** 2);
-  }
-
-  function getRandomPosition() {
-    return [document.body.clientWidth * Math.random(), document.body.clientHeight * Math.random()];
-  }
-};
-
-window.b = Bunny(svg);
+function toggleClass(el, className, milliseconds) {
+  if (el.length === undefined) { el = [el]; }
+  el.forEach(e => e.classList.add(className));
+  setTimeout(() => el.forEach(e => e.classList.remove(className)), milliseconds);
+}
+function getRandomPosition() {
+  return [
+    document.body.offsetWidth * Math.random(),
+    document.body.offsetHeight * Math.random()
+  ];
+}
 
 function MouseHandler(event) {
   MouseHandler.P[0] = event.pageX;
   MouseHandler.P[1] = event.pageY;
 }
 MouseHandler.P = [0, 0];
-
+document.addEventListener("mousemove", MouseHandler);
 function getMousePosition() {
   return MouseHandler.P;
 }
-document.addEventListener("mousemove", MouseHandler);
-document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()));
+
+window.b = new Bun(svg);
+// document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()));
+b.startActingNatural()
+
