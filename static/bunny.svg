@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 2000 800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1700 800">
 <style type="text/css">
 @keyframes rotate10 {
   0% {
@@ -96,9 +96,15 @@
   display:inherit;
 }
 
-#speech>text {
+#speech {
   font-family: monospace;
-  font-size: 6em;
+  font-size: 7em;
+  font-weight: 100;
+}
+#speech>foreignObject {
+  border: 2px solid black;
+  border-radius: 15%;
+  padding: 50px;
 }
 
 </style>
@@ -133,9 +139,9 @@
       <path id="mouth-closed" d="M 145 20 h 110 " />
     </g>
     <g id="speech">
-      <text x="500" y="-200">
-        <!--tspan>hello world</tspan-->
-      </text>
+      <foreignObject x="500" y="-475" width="675" height="600">
+        <p id="speech-text" xmlns="http://www.w3.org/1999/xhtml">Text goes here</p>
+      </foreignObject>
     </g>
   </g>
 </svg>

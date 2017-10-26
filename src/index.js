@@ -1,6 +1,6 @@
 const container = document.createElement("div");
 container.innerHTML = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 2000 800">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1700 800">
 <style type="text/css">
 @keyframes rotate10 {
   0% {
@@ -98,9 +98,15 @@ container.innerHTML = `
   display:inherit;
 }
 
-#speech>text {
+#speech {
   font-family: monospace;
-  font-size: 6em;
+  font-size: 7em;
+  font-weight: 100;
+}
+#speech>foreignObject {
+  border: 2px solid black;
+  border-radius: 15%;
+  padding: 50px;
 }
 
 </style>
@@ -135,16 +141,16 @@ container.innerHTML = `
       <path id="mouth-closed" d="M 145 20 h 110 " />
     </g>
     <g id="speech">
-      <text x="500" y="-200">
-        <!--tspan>hello world</tspan-->
-      </text>
+      <foreignObject x="500" y="-475" width="675" height="600">
+        <p id="speech-text" xmlns="http://www.w3.org/1999/xhtml">Text goes here</p>
+      </foreignObject>
     </g>
   </g>
 </svg>
 `;
 const svg = container.children[0];
 svg.style.cssText =
-  "left:0;top:0;margin:0;overflow:hidden;height:100vh;width:100vw;position:absolute;z-index:9999999;pointer-events:none;";
+  "left:0;top:0;margin:0;overflow:hidden;height:100vh;width:100vw;position:absolute;z-index:9999999;";//pointer-events:none;";
 document.body.appendChild(svg);
 
 class Bun {
@@ -153,14 +159,17 @@ class Bun {
    * @param {SVGElement} svg
    */
   constructor(svg) {
-
     this.svg = svg;
     this.transform1 = this.svg.createSVGTransform();
     this.transform2 = this.svg.createSVGTransform();
     this.transform3 = this.svg.createSVGTransform();
+    this.stransform1 = this.svg.createSVGTransform();
+    this.stransform2 = this.svg.createSVGTransform();
     this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform1);
     this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform2);
     this.svg.querySelector("#group").transform.baseVal.appendItem(this.transform3);
+    this.svg.querySelector("#speech").transform.baseVal.appendItem(this.stransform1);
+    this.svg.querySelector("#speech").transform.baseVal.appendItem(this.stransform2);
     this.speed = 0.1; // units/ms
     this.animation = undefined;
     this.destination = [0, 0];
@@ -171,6 +180,8 @@ class Bun {
   flip() {
     this.facing = -1 * this.facing;
     this.transform2.setScale(this.facing, 1);
+    this.stransform2.setTranslate(this.facing === -1 ? -1675 : 0, 0);
+    this.stransform1.setScale(this.facing, 1);
   }
   scale(sx = 1, sy) {
     sy = sy || sx;
@@ -279,6 +290,14 @@ class Bun {
     }
     this.updatePosition.lastUpdate = now;
   }
+  speak(msg = "") {
+    if (msg === "") {
+      this.svg.querySelector("#speech").style.display = "none";
+    } else {
+      this.svg.querySelector("#speech").style.display = "";
+      this.svg.querySelector("#speech-text").innerText = msg;
+    }
+  }
 }
 
 function toggleClass(el, className, milliseconds) {
@@ -304,6 +323,7 @@ function getMousePosition() {
 }
 
 window.b = new Bun(svg);
+b.startMoving([500, 0])
 // document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()));
-b.startActingNatural()
+// b.startActingNatural()
 
