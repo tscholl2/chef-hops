@@ -1,10 +1,10 @@
 class Bun {
   /**
    * Bunny class. Draws and controls a bunny on an SVG element.
-   * @param {SVGElement} svg
+   * It appends it in the given container.
+   * @param {HTMLElement} container
    */
   constructor(container) {
-
     container.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="-500 -500 1700 800">
     <style type="text/css">
