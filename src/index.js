@@ -155,7 +155,7 @@ class Bun {
     </svg>
     `;
     const svg = container.children[0];
-    svg.style.cssText = "height:100%;width:100%";
+    svg.style.cssText = "height:100%;width:100%;margin:0;padding:0;display:block;";
     this.svg = svg;
     this.transform1 = this.svg.createSVGTransform();
     this.transform2 = this.svg.createSVGTransform();
@@ -327,7 +327,7 @@ const styles = { width: "100vw", height: "100vh", top: "0", left: "0", overflow:
 for (let k in styles) {
   div.style[k] = styles[k];
 }
-
+b.scale(0.5)
 b.startMoving([500, 0])
 // document.onclick = () => b.startMoving(b.pageCoordinatesToSVGCoordinates(getMousePosition()));
 // b.startActingNatural()
